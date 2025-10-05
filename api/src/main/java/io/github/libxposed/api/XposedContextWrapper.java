@@ -1,7 +1,6 @@
 package io.github.libxposed.api;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.ContextWrapper;
 
 import androidx.annotation.NonNull;
@@ -96,8 +95,16 @@ public class XposedContextWrapper extends ContextWrapper implements XposedInterf
      */
     @NonNull
     @Override
-    public final MethodUnhooker<BeforeHooker<Method>, Method> hookBefore(@NonNull Method origin, @NonNull BeforeHooker<Method> hooker) {
-        return getBaseContext().hookBefore(origin, hooker);
+    public final Unhooker hook(@NonNull Method origin, @NonNull Injector injector) {
+        return getBaseContext().hook(origin, injector);
+    }
+    /**
+     * {@inheritDoc}
+     */
+    @NonNull
+    @Override
+    public final Unhooker hook(@NonNull Method origin, int priority, @NonNull Injector injector) {
+        return getBaseContext().hook(origin, priority, injector);
     }
 
     /**
@@ -105,98 +112,16 @@ public class XposedContextWrapper extends ContextWrapper implements XposedInterf
      */
     @NonNull
     @Override
-    public final MethodUnhooker<AfterHooker<Method>, Method> hookAfter(@NonNull Method origin, @NonNull AfterHooker<Method> hooker) {
-        return getBaseContext().hookAfter(origin, hooker);
+    public final Unhooker hook(@NonNull Constructor<?> origin, @NonNull Injector injector) {
+        return getBaseContext().hook(origin, injector);
     }
-
     /**
      * {@inheritDoc}
      */
     @NonNull
     @Override
-    public final MethodUnhooker<Hooker<Method>, Method> hook(@NonNull Method origin, @NonNull Hooker<Method> hooker) {
-        return getBaseContext().hook(origin, hooker);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @NonNull
-    @Override
-    public final MethodUnhooker<BeforeHooker<Method>, Method> hookBefore(@NonNull Method origin, int priority, @NonNull BeforeHooker<Method> hooker) {
-        return getBaseContext().hookBefore(origin, priority, hooker);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @NonNull
-    @Override
-    public final MethodUnhooker<AfterHooker<Method>, Method> hookAfter(@NonNull Method origin, int priority, @NonNull AfterHooker<Method> hooker) {
-        return getBaseContext().hookAfter(origin, priority, hooker);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @NonNull
-    @Override
-    public final MethodUnhooker<Hooker<Method>, Method> hook(@NonNull Method origin, int priority, @NonNull Hooker<Method> hooker) {
-        return getBaseContext().hook(origin, priority, hooker);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @NonNull
-    @Override
-    public final <T> MethodUnhooker<BeforeHooker<Constructor<T>>, Constructor<T>> hookBefore(@NonNull Constructor<T> origin, @NonNull BeforeHooker<Constructor<T>> hooker) {
-        return getBaseContext().hookBefore(origin, hooker);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @NonNull
-    @Override
-    public final <T> MethodUnhooker<AfterHooker<Constructor<T>>, Constructor<T>> hookAfter(@NonNull Constructor<T> origin, @NonNull AfterHooker<Constructor<T>> hooker) {
-        return getBaseContext().hookAfter(origin, hooker);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @NonNull
-    @Override
-    public final <T> MethodUnhooker<Hooker<Constructor<T>>, Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Hooker<Constructor<T>> hooker) {
-        return getBaseContext().hook(origin, hooker);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @NonNull
-    @Override
-    public final <T> MethodUnhooker<BeforeHooker<Constructor<T>>, Constructor<T>> hookBefore(@NonNull Constructor<T> origin, int priority, @NonNull BeforeHooker<Constructor<T>> hooker) {
-        return getBaseContext().hookBefore(origin, priority, hooker);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @NonNull
-    @Override
-    public final <T> MethodUnhooker<AfterHooker<Constructor<T>>, Constructor<T>> hookAfter(@NonNull Constructor<T> origin, int priority, @NonNull AfterHooker<Constructor<T>> hooker) {
-        return getBaseContext().hookAfter(origin, priority, hooker);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @NonNull
-    @Override
-    public final <T> MethodUnhooker<Hooker<Constructor<T>>, Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Hooker<Constructor<T>> hooker) {
-        return getBaseContext().hook(origin, priority, hooker);
+    public final Unhooker hook(@NonNull Constructor<?> origin, int priority, @NonNull Injector injector) {
+        return getBaseContext().hook(origin, priority, injector);
     }
 
     /**
@@ -280,7 +205,7 @@ public class XposedContextWrapper extends ContextWrapper implements XposedInterf
      * {@inheritDoc}
      */
     @Override
-    protected final void attachBaseContext(Context base) {
+    protected final void attachBaseContext(android.content.Context base) {
         if (base instanceof XposedContext || base instanceof XposedContextWrapper) {
             super.attachBaseContext(base);
         } else {

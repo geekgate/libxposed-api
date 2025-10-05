@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
@@ -61,19 +62,14 @@ public interface XposedInterface {
      */
     int PRIORITY_HIGHEST = 10000;
 
-    /**
-     * The interface Before hook callback.
-     *
-     * @param <T> the type parameter
-     */
-    interface BeforeHookCallback<T> {
+    interface Context {
         /**
          * Gets origin.
          *
          * @return the origin
          */
         @NonNull
-        T getOrigin();
+        Executable getOrigin();
 
         /**
          * Gets this.
@@ -82,33 +78,23 @@ public interface XposedInterface {
          */
         @Nullable
         Object getThis();
-
         /**
-         * Get args object [ ].
+         * Invoke origin object.
          *
-         * @return the object [ ]
-         */
-        @NonNull
-        Object[] getArgs();
-
-        /**
-         * Gets arg.
-         *
-         * @param <U>   the type parameter
-         * @param index the index
-         * @return the arg
+         * @return the object
+         * @throws InvocationTargetException the invocation target exception
+         * @throws IllegalArgumentException  the illegal argument exception
+         * @throws IllegalAccessException    the illegal access exception
          */
         @Nullable
-        <U> U getArg(int index);
+        Object invokeOrigin() throws InvocationTargetException, IllegalArgumentException, IllegalAccessException;
+    }
 
-        /**
-         * Sets arg.
-         *
-         * @param <U>   the type parameter
-         * @param index the index
-         * @param value the value
-         */
-        <U> void setArg(int index, U value);
+    /**
+     * The interface Before hook callback.
+     *
+     */
+    interface BeforeHookContext extends Context {
 
         /**
          * Return and skip.
@@ -125,17 +111,6 @@ public interface XposedInterface {
         void throwAndSkip(@Nullable Throwable throwable);
 
         /**
-         * Invoke origin object.
-         *
-         * @return the object
-         * @throws InvocationTargetException the invocation target exception
-         * @throws IllegalArgumentException  the illegal argument exception
-         * @throws IllegalAccessException    the illegal access exception
-         */
-        @Nullable
-        Object invokeOrigin() throws InvocationTargetException, IllegalArgumentException, IllegalAccessException;
-
-        /**
          * Sets extra.
          *
          * @param <U>   the type parameter
@@ -149,24 +124,8 @@ public interface XposedInterface {
     /**
      * The interface After hook callback.
      *
-     * @param <T> the type parameter
      */
-    interface AfterHookCallback<T> {
-        /**
-         * Gets origin.
-         *
-         * @return the origin
-         */
-        @NonNull
-        T getOrigin();
-
-        /**
-         * Gets this.
-         *
-         * @return the this
-         */
-        @Nullable
-        Object getThis();
+    interface AfterHookContext extends Context {
 
         /**
          * Get args object [ ].
@@ -214,16 +173,6 @@ public interface XposedInterface {
         void setThrowable(@Nullable Throwable throwable);
 
         /**
-         * Invoke origin object.
-         *
-         * @return the object
-         * @throws InvocationTargetException the invocation target exception
-         * @throws IllegalAccessException    the illegal access exception
-         */
-        @Nullable
-        Object invokeOrigin() throws InvocationTargetException, IllegalAccessException;
-
-        /**
          * Gets extra.
          *
          * @param <U> the type parameter
@@ -234,64 +183,63 @@ public interface XposedInterface {
         <U> U getExtra(@NonNull String key);
     }
 
+    interface Injector { }
+
     /**
      * The interface Before hooker.
      *
-     * @param <T> the type parameter
      */
-    interface BeforeHooker<T> {
+    @FunctionalInterface
+    interface PreInjector extends Injector {
         /**
          * Before.
          *
          * @param callback the callback
          */
-        void before(@NonNull BeforeHookCallback<T> callback);
+        void inject(@NonNull BeforeHookContext callback, Object ...args);
     }
 
     /**
      * The interface After hooker.
      *
-     * @param <T> the type parameter
      */
-    interface AfterHooker<T> {
+    @FunctionalInterface
+    interface PostInjector extends Injector {
         /**
          * After.
          *
          * @param callback the callback
          */
-        void after(@NonNull AfterHookCallback<T> callback);
+        void inject(@NonNull AfterHookContext callback, Object returnValue, Throwable throwable);
     }
 
     /**
      * The interface Hooker.
      *
-     * @param <T> the type parameter
      */
-    interface Hooker<T> extends BeforeHooker<T>, AfterHooker<T> {
+    interface Hook extends PreInjector, PostInjector {
     }
 
     /**
      * The interface Method unhooker.
      *
-     * @param <T> the type parameter
-     * @param <U> the type parameter
      */
-    interface MethodUnhooker<T, U> {
+    interface Unhooker {
         /**
-         * Gets origin.
+         * Gets origin method/constructor.
          *
          * @return the origin
          */
         @NonNull
-        U getOrigin();
+        Executable getOrigin();
 
         /**
-         * Gets hooker.
+         * Gets injector.
          *
-         * @return the hooker
+         * @return the injector
          */
         @NonNull
-        T getHooker();
+        Injector getInjector();
 
         /**
          * Unhook.
@@ -342,160 +290,53 @@ public interface XposedInterface {
     Object featuredMethod(String name, Object... args);
 
     /**
-     * Hook before method unhooker.
+     * Hook method unhooker.
      *
-     * @param origin the origin
-     * @param hooker the hooker
+     * @param origin the origin method
+     * @param injector the hooker
      * @return the method unhooker
      * @throws IllegalArgumentException if origin is abstract, framework internal or {@link Method#invoke}
      * @throws HookFailedError          if hook fails due to framework internal error
      */
     @NonNull
-    MethodUnhooker<BeforeHooker<Method>, Method> hookBefore(@NonNull Method origin, @NonNull BeforeHooker<Method> hooker);
-
-    /**
-     * Hook after method unhooker.
-     *
-     * @param origin the origin
-     * @param hooker the hooker
-     * @return the method unhooker
-     * @throws IllegalArgumentException if origin is abstract, framework internal or {@link Method#invoke}
-     * @throws HookFailedError          if hook fails due to framework internal error
-     */
-    @NonNull
-    MethodUnhooker<AfterHooker<Method>, Method> hookAfter(@NonNull Method origin, @NonNull AfterHooker<Method> hooker);
+    Unhooker hook(@NonNull Method origin, @NonNull Injector injector);
 
     /**
      * Hook method unhooker.
      *
-     * @param origin the origin
-     * @param hooker the hooker
-     * @return the method unhooker
-     * @throws IllegalArgumentException if origin is abstract, framework internal or {@link Method#invoke}
-     * @throws HookFailedError          if hook fails due to framework internal error
-     */
-    @NonNull
-    MethodUnhooker<Hooker<Method>, Method> hook(@NonNull Method origin, @NonNull Hooker<Method> hooker);
-
-    /**
-     * Hook before method unhooker.
-     *
-     * @param origin   the origin
+     * @param origin   the origin method
      * @param priority the priority
-     * @param hooker   the hooker
+     * @param injector   the hooker
      * @return the method unhooker
      * @throws IllegalArgumentException if origin is abstract, framework internal or {@link Method#invoke}
      * @throws HookFailedError          if hook fails due to framework internal error
      */
     @NonNull
-    MethodUnhooker<BeforeHooker<Method>, Method> hookBefore(@NonNull Method origin, int priority, @NonNull BeforeHooker<Method> hooker);
-
+    Unhooker hook(@NonNull Method origin, int priority, @NonNull Injector injector);
     /**
-     * Hook after method unhooker.
+     * Hook method unhooker.
      *
-     * @param origin   the origin
-     * @param priority the priority
-     * @param hooker   the hooker
+     * @param origin the origin constructor
+     * @param injector the hooker
      * @return the method unhooker
      * @throws IllegalArgumentException if origin is abstract, framework internal or {@link Method#invoke}
      * @throws HookFailedError          if hook fails due to framework internal error
      */
     @NonNull
-    MethodUnhooker<AfterHooker<Method>, Method> hookAfter(@NonNull Method origin, int priority, @NonNull AfterHooker<Method> hooker);
+    Unhooker hook(@NonNull Constructor<?> origin, @NonNull Injector injector);
 
     /**
      * Hook method unhooker.
      *
-     * @param origin   the origin
+     * @param origin   the origin constructor
      * @param priority the priority
-     * @param hooker   the hooker
+     * @param injector   the hooker
      * @return the method unhooker
      * @throws IllegalArgumentException if origin is abstract, framework internal or {@link Method#invoke}
      * @throws HookFailedError          if hook fails due to framework internal error
      */
     @NonNull
-    MethodUnhooker<Hooker<Method>, Method> hook(@NonNull Method origin, int priority, @NonNull Hooker<Method> hooker);
-
-    /**
-     * Hook before method unhooker.
-     *
-     * @param <T>    the type parameter
-     * @param origin the origin
-     * @param hooker the hooker
-     * @return the method unhooker
-     * @throws IllegalArgumentException if origin is abstract, framework internal or {@link Method#invoke}
-     * @throws HookFailedError          if hook fails due to framework internal error
-     */
-    @NonNull
-    <T> MethodUnhooker<BeforeHooker<Constructor<T>>, Constructor<T>> hookBefore(@NonNull Constructor<T> origin, @NonNull BeforeHooker<Constructor<T>> hooker);
-
-    /**
-     * Hook after method unhooker.
-     *
-     * @param <T>    the type parameter
-     * @param origin the origin
-     * @param hooker the hooker
-     * @return the method unhooker
-     * @throws IllegalArgumentException if origin is abstract, framework internal or {@link Method#invoke}
-     * @throws HookFailedError          if hook fails due to framework internal error
-     */
-    @NonNull
-    <T> MethodUnhooker<AfterHooker<Constructor<T>>, Constructor<T>> hookAfter(@NonNull Constructor<T> origin, @NonNull AfterHooker<Constructor<T>> hooker);
-
-    /**
-     * Hook method unhooker.
-     *
-     * @param <T>    the type parameter
-     * @param origin the origin
-     * @param hooker the hooker
-     * @return the method unhooker
-     * @throws IllegalArgumentException if origin is abstract, framework internal or {@link Method#invoke}
-     * @throws HookFailedError          if hook fails due to framework internal error
-     */
-    @NonNull
-    <T> MethodUnhooker<Hooker<Constructor<T>>, Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Hooker<Constructor<T>> hooker);
-
-    /**
-     * Hook before method unhooker.
-     *
-     * @param <T>      the type parameter
-     * @param origin   the origin
-     * @param priority the priority
-     * @param hooker   the hooker
-     * @return the method unhooker
-     * @throws IllegalArgumentException if origin is abstract, framework internal or {@link Method#invoke}
-     * @throws HookFailedError          if hook fails due to framework internal error
-     */
-    @NonNull
-    <T> MethodUnhooker<BeforeHooker<Constructor<T>>, Constructor<T>> hookBefore(@NonNull Constructor<T> origin, int priority, @NonNull BeforeHooker<Constructor<T>> hooker);
-
-    /**
-     * Hook after method unhooker.
-     *
-     * @param <T>      the type parameter
-     * @param origin   the origin
-     * @param priority the priority
-     * @param hooker   the hooker
-     * @return the method unhooker
-     * @throws IllegalArgumentException if origin is abstract, framework internal or {@link Method#invoke}
-     * @throws HookFailedError          if hook fails due to framework internal error
-     */
-    @NonNull
-    <T> MethodUnhooker<AfterHooker<Constructor<T>>, Constructor<T>> hookAfter(@NonNull Constructor<T> origin, int priority, @NonNull AfterHooker<Constructor<T>> hooker);
-
-    /**
-     * Hook method unhooker.
-     *
-     * @param <T>      the type parameter
-     * @param origin   the origin
-     * @param priority the priority
-     * @param hooker   the hooker
-     * @return the method unhooker
-     * @throws IllegalArgumentException if origin is abstract, framework internal or {@link Method#invoke}
-     * @throws HookFailedError          if hook fails due to framework internal error
-     */
-    @NonNull
-    <T> MethodUnhooker<Hooker<Constructor<T>>, Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Hooker<Constructor<T>> hooker);
+    Unhooker hook(@NonNull Constructor<?> origin, int priority, @NonNull Injector injector);
 
     /**
      * Deoptimize boolean.
