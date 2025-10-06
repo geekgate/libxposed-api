@@ -3,6 +3,7 @@ package io.github.libxposed.api;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.res.Resources;
+import android.util.Log;
 
 import androidx.annotation.Discouraged;
 import androidx.annotation.NonNull;
@@ -29,7 +30,7 @@ public interface XposedInterface {
     /**
      * SDK API version.
      */
-    int API = 100;
+    int API = 200;
 
     /**
      * Indicates that the framework is running as root.
@@ -70,7 +71,6 @@ public interface XposedInterface {
          */
         @NonNull
         Executable getOrigin();
-
         /**
          * Gets this.
          *
@@ -88,6 +88,18 @@ public interface XposedInterface {
          */
         @Nullable
         Object invokeOrigin() throws InvocationTargetException, IllegalArgumentException, IllegalAccessException;
+        /**
+         * Load a class in the hooked app.
+         * @param className the class name
+         * @return the class
+         * @throws ClassNotFoundException if the class cannot be located
+         */
+        Class<?> loadClass(@NonNull String className) throws ClassNotFoundException;
+        /**
+         * Gets log.
+         * @return the log
+         */
+        Log getLog();
     }
 
     /**
@@ -194,9 +206,9 @@ public interface XposedInterface {
         /**
          * Before.
          *
-         * @param callback the callback
+         * @param context the context
          */
-        void inject(@NonNull BeforeHookContext callback, Object ...args);
+        void inject(@NonNull BeforeHookContext context, Object ...args);
     }
 
     /**
@@ -208,9 +220,9 @@ public interface XposedInterface {
         /**
          * After.
          *
-         * @param callback the callback
+         * @param context the context
          */
-        void inject(@NonNull AfterHookContext callback, Object returnValue, Throwable throwable);
+        void inject(@NonNull AfterHookContext context, Object returnValue, Throwable throwable);
     }
 
     /**
