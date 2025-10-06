@@ -63,6 +63,15 @@ public interface XposedInterface {
      */
     int PRIORITY_HIGHEST = 10000;
 
+    interface Logger {
+        void info(Object ... args);
+        void warn(Object ... args);
+        void error(Object ... args);
+        void error(Throwable t);
+        void debug(Object ... args);
+        void verbose(Object ... args);
+    }
+
     interface Context {
         /**
          * Gets origin.
@@ -99,7 +108,7 @@ public interface XposedInterface {
          * Gets log.
          * @return the log
          */
-        Log getLog();
+        Logger getLogger();
     }
 
     /**
