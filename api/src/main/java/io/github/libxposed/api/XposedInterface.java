@@ -3,7 +3,6 @@ package io.github.libxposed.api;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.res.Resources;
-import android.util.Log;
 
 import androidx.annotation.Discouraged;
 import androidx.annotation.NonNull;
@@ -30,7 +29,7 @@ public interface XposedInterface {
     /**
      * SDK API version.
      */
-    int API = 200;
+    int API = 101;
 
     /**
      * Indicates that the framework is running as root.
@@ -204,6 +203,9 @@ public interface XposedInterface {
         <U> U getExtra(@NonNull String key);
     }
 
+    /**
+     * The interface Injector. Find the injection method based on the method signature.
+     */
     interface Injector { }
 
     /**
@@ -216,8 +218,9 @@ public interface XposedInterface {
          * Before.
          *
          * @param context the context
+         * @param args the args
          */
-        void inject(@NonNull BeforeHookContext context, Object ...args);
+        void inject(@NonNull BeforeHookContext context, Object[] args);
     }
 
     /**
