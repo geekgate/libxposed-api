@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.PackageInfo;
+import android.content.res.AssetManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -206,6 +207,11 @@ public class XposedContextWrapper extends ContextWrapper implements XposedInterf
     @Override
     public PackageInfo getPackageInfo() {
         return getBaseContext().getPackageInfo();
+    }
+
+    @Override
+    public AssetManager getAssetManager() {
+        return getBaseContext().getAssetManager();
     }
 
     @Override

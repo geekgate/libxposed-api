@@ -3,6 +3,7 @@ package io.github.libxposed.api;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
+import android.content.res.AssetManager;
 import android.content.res.Resources;
 
 import androidx.annotation.Discouraged;
@@ -546,6 +547,7 @@ public interface XposedInterface {
     ApplicationInfo getApplicationInfo();
 
     PackageInfo getPackageInfo();
+    AssetManager getAssetManager();
 
     android.content.Context getSystemContext();
 }
