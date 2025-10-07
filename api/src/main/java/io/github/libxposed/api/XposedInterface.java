@@ -2,6 +2,7 @@ package io.github.libxposed.api;
 
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.res.Resources;
 
 import androidx.annotation.Discouraged;
@@ -63,19 +64,49 @@ public interface XposedInterface {
     int PRIORITY_HIGHEST = 10000;
 
     interface Logger {
-        void info(Object ... args);
-        void warn(Object ... args);
-        void error(Object ... args);
-        void error(Throwable t);
-        void debug(Object ... args);
-        void verbose(Object ... args);
+        /**
+         * Logs an info message.
+         * @param args the args
+         */
+        void i(Object ... args);
+        /**
+         * Logs a warning message.
+         * @param args the args
+         */
+        void w(Object ... args);
+        /**
+         * Logs an error message.
+         * @param args the args
+         */
+        void e(Object ... args);
+        /**
+         * Logs an error message.
+         * @param message the message
+         * @param t the throwable
+         */
+        void e(String  message, Throwable t);
+        /**
+         * Logs a debug message.
+         * @param args the args
+         */
+        void d(Object ... args);
+        /**
+         * Logs a verbose message.
+         * @param args the args
+         */
+        void v(Object ... args);
+        /**
+         * Logs a bare message without a tag.
+         * @param args the args
+         */
+        void z(Object ... args);
     }
 
     interface Context {
         /**
-         * Gets origin.
+         * Gets original method or constructor.
          *
-         * @return the origin
+         * @return the original method or constructor.
          */
         @NonNull
         Executable getOrigin();
@@ -87,7 +118,7 @@ public interface XposedInterface {
         @Nullable
         Object getThis();
         /**
-         * Invoke origin object.
+         * Invoke original object.
          *
          * @return the object
          * @throws InvocationTargetException the invocation target exception
@@ -422,7 +453,6 @@ public interface XposedInterface {
     @NonNull
     <T> T newInstanceOrigin(@NonNull Constructor<T> constructor, Object... args) throws InvocationTargetException, IllegalArgumentException, IllegalAccessException, InstantiationException;
 
-
     /**
      * New instance special u.
      *
@@ -514,4 +544,8 @@ public interface XposedInterface {
      * @return the application info
      */
     ApplicationInfo getApplicationInfo();
+
+    PackageInfo getPackageInfo();
+
+    android.content.Context getSystemContext();
 }

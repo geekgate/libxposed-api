@@ -57,6 +57,13 @@ public interface XposedModuleInterface {
          */
         @NonNull
         String getPackageName();
+        /**
+         * Get the package version of the package being loaded.
+         *
+         * @return The package version.
+         */
+        @NonNull
+        String getPackageVersion();
 
         /**
          * Get the ApplicationInfo of the package being loaded.

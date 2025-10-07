@@ -1,7 +1,9 @@
 package io.github.libxposed.api;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.pm.PackageInfo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -199,6 +201,16 @@ public class XposedContextWrapper extends ContextWrapper implements XposedInterf
     @Override
     public final DexParser parseDex(@NonNull ByteBuffer dexData, boolean includeAnnotations) throws IOException {
         return getBaseContext().parseDex(dexData, includeAnnotations);
+    }
+
+    @Override
+    public PackageInfo getPackageInfo() {
+        return getBaseContext().getPackageInfo();
+    }
+
+    @Override
+    public android.content.Context getSystemContext() {
+        return getBaseContext().getSystemContext();
     }
 
     /**
