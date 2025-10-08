@@ -128,18 +128,6 @@ public interface XposedInterface {
          */
         @Nullable
         Object invokeOrigin() throws InvocationTargetException, IllegalArgumentException, IllegalAccessException;
-        /**
-         * Load a class in the hooked app.
-         * @param className the class name
-         * @return the class
-         * @throws ClassNotFoundException if the class cannot be located
-         */
-        Class<?> loadClass(@NonNull String className) throws ClassNotFoundException;
-        /**
-         * Gets log.
-         * @return the log
-         */
-        Logger getLogger();
     }
 
     /**
