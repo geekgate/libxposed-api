@@ -26,7 +26,7 @@ public interface XposedInterface {
     /**
      * SDK API version.
      */
-    int API = 100;
+    int API = 200;
 
     /**
      * Indicates that the framework is running as root.
@@ -270,6 +270,9 @@ public interface XposedInterface {
      */
     @NonNull
     MethodUnhooker<Method> hook(@NonNull Method origin, @NonNull Class<? extends Hooker> hooker);
+    MethodUnhooker<Method> hook(@NonNull Method origin, @NonNull Injector.PreInjector injector);
+    MethodUnhooker<Method> hook(@NonNull Method origin, @NonNull Injector.PostInjector injector);
+    MethodUnhooker<Method> hook(@NonNull Method origin, @NonNull Injector.Hook injector);
 
     /**
      * Hook the static initializer of a class with default priority.
@@ -315,6 +318,9 @@ public interface XposedInterface {
      */
     @NonNull
     MethodUnhooker<Method> hook(@NonNull Method origin, int priority, @NonNull Class<? extends Hooker> hooker);
+    MethodUnhooker<Method> hook(@NonNull Method origin, int priority, @NonNull Injector.PreInjector injector);
+    MethodUnhooker<Method> hook(@NonNull Method origin, int priority, @NonNull Injector.PostInjector injector);
+    MethodUnhooker<Method> hook(@NonNull Method origin, int priority, @NonNull Injector.Hook injector);
 
     /**
      * Hook a constructor with default priority.
@@ -329,6 +335,9 @@ public interface XposedInterface {
      */
     @NonNull
     <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Class<? extends Hooker> hooker);
+    <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Injector.PreInjector injector);
+    <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Injector.PostInjector injector);
+    <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Injector.Hook injector);
 
     /**
      * Hook a constructor with specified priority.
@@ -344,6 +353,9 @@ public interface XposedInterface {
      */
     @NonNull
     <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Class<? extends Hooker> hooker);
+    <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Injector.PreInjector injector);
+    <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Injector.PostInjector injector);
+    <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Injector.Hook injector);
 
     /**
      * Deoptimizes a method in case hooked callee is not called because of inline.

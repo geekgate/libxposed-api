@@ -55,6 +55,21 @@ public class XposedInterfaceWrapper implements XposedInterface {
         return mBase.hook(origin, hooker);
     }
 
+    @Override
+    public MethodUnhooker<Method> hook(@NonNull Method origin, @NonNull Injector.PreInjector injector) {
+        return mBase.hook(origin, injector);
+    }
+
+    @Override
+    public MethodUnhooker<Method> hook(@NonNull Method origin, @NonNull Injector.PostInjector injector) {
+        return mBase.hook(origin, injector);
+    }
+
+    @Override
+    public MethodUnhooker<Method> hook(@NonNull Method origin, @NonNull Injector.Hook injector) {
+        return mBase.hook(origin, injector);
+    }
+
     @NonNull
     @Override
     public <T> MethodUnhooker<Constructor<T>> hookClassInitializer(@NonNull Class<T> origin, @NonNull Class<? extends Hooker> hooker) {
@@ -73,16 +88,61 @@ public class XposedInterfaceWrapper implements XposedInterface {
         return mBase.hook(origin, priority, hooker);
     }
 
+    @Override
+    public MethodUnhooker<Method> hook(@NonNull Method origin, int priority, @NonNull Injector.PreInjector injector) {
+        return mBase.hook(origin, priority, injector);
+    }
+
+    @Override
+    public MethodUnhooker<Method> hook(@NonNull Method origin, int priority, @NonNull Injector.PostInjector injector) {
+        return mBase.hook(origin, priority, injector);
+    }
+
+    @Override
+    public MethodUnhooker<Method> hook(@NonNull Method origin, int priority, @NonNull Injector.Hook injector) {
+        return mBase.hook(origin, priority, injector);
+    }
+
     @NonNull
     @Override
     public final <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Class<? extends Hooker> hooker) {
         return mBase.hook(origin, hooker);
     }
 
+    @Override
+    public <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Injector.PreInjector injector) {
+        return mBase.hook(origin, injector);
+    }
+
+    @Override
+    public <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Injector.PostInjector injector) {
+        return mBase.hook(origin, injector);
+    }
+
+    @Override
+    public <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Injector.Hook injector) {
+        return mBase.hook(origin, injector);
+    }
+
     @NonNull
     @Override
     public final <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Class<? extends Hooker> hooker) {
         return mBase.hook(origin, priority, hooker);
+    }
+
+    @Override
+    public <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Injector.PreInjector injector) {
+        return mBase.hook(origin, priority, injector);
+    }
+
+    @Override
+    public <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Injector.PostInjector injector) {
+        return mBase.hook(origin, priority, injector);
+    }
+
+    @Override
+    public <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Injector.Hook injector) {
+        return mBase.hook(origin, priority, injector);
     }
 
     @Override
