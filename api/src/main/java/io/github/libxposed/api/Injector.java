@@ -14,14 +14,14 @@ public interface Injector {
     }
     @FunctionalInterface
     interface PostInjector extends Injector {
-        void inject(@NonNull XposedInterface.AfterHookCallback callback, @NonNull Object result, @Nullable Throwable throwable);
+        void inject(@NonNull XposedInterface.AfterHookCallback callback, Object result, Throwable throwable);
     }
     interface Hook extends PreInjector, PostInjector {
         @Override
         default void inject(@NonNull XposedInterface.BeforeHookCallback callback, @NonNull Object[] args) {
         }
         @Override
-        default void inject(@NonNull XposedInterface.AfterHookCallback callback, @NonNull Object result, @Nullable Throwable throwable) {
+        default void inject(@NonNull XposedInterface.AfterHookCallback callback, Object result, Throwable throwable) {
         }
     }
 }
