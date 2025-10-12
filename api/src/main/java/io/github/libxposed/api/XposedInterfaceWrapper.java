@@ -49,99 +49,63 @@ public class XposedInterfaceWrapper implements XposedInterface {
         return mBase.getFrameworkPrivilege();
     }
 
-    @NonNull
     @Override
-    public final MethodUnhooker<Method> hook(@NonNull Method origin, @NonNull Class<? extends Hooker> hooker) {
-        return mBase.hook(origin, hooker);
-    }
-
-    @Override
-    public MethodUnhooker<Method> hook(@NonNull Method origin, @NonNull Injector.PreInjector injector) {
+    public final Handler<Method> hook(@NonNull Method origin, @NonNull Pre<?> injector) {
         return mBase.hook(origin, injector);
     }
 
     @Override
-    public MethodUnhooker<Method> hook(@NonNull Method origin, @NonNull Injector.PostInjector injector) {
+    public final Handler<Method> hook(@NonNull Method origin, @NonNull Post<?> injector) {
         return mBase.hook(origin, injector);
     }
 
     @Override
-    public MethodUnhooker<Method> hook(@NonNull Method origin, @NonNull Injector.Hook injector) {
+    public final Handler<Method> hook(@NonNull Method origin, @NonNull Hook<?,?> injector) {
         return mBase.hook(origin, injector);
     }
 
-    @NonNull
     @Override
-    public <T> MethodUnhooker<Constructor<T>> hookClassInitializer(@NonNull Class<T> origin, @NonNull Class<? extends Hooker> hooker) {
-        return mBase.hookClassInitializer(origin, hooker);
-    }
-
-    @NonNull
-    @Override
-    public <T> MethodUnhooker<Constructor<T>> hookClassInitializer(@NonNull Class<T> origin, int priority, @NonNull Class<? extends Hooker> hooker) {
-        return mBase.hookClassInitializer(origin, priority, hooker);
-    }
-
-    @NonNull
-    @Override
-    public final MethodUnhooker<Method> hook(@NonNull Method origin, int priority, @NonNull Class<? extends Hooker> hooker) {
-        return mBase.hook(origin, priority, hooker);
-    }
-
-    @Override
-    public MethodUnhooker<Method> hook(@NonNull Method origin, int priority, @NonNull Injector.PreInjector injector) {
+    public final Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Pre<?> injector) {
         return mBase.hook(origin, priority, injector);
     }
 
     @Override
-    public MethodUnhooker<Method> hook(@NonNull Method origin, int priority, @NonNull Injector.PostInjector injector) {
+    public final Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Post<?> injector) {
         return mBase.hook(origin, priority, injector);
     }
 
     @Override
-    public MethodUnhooker<Method> hook(@NonNull Method origin, int priority, @NonNull Injector.Hook injector) {
+    public final Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Hook<?,?> injector) {
         return mBase.hook(origin, priority, injector);
     }
 
-    @NonNull
     @Override
-    public final <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Class<? extends Hooker> hooker) {
-        return mBase.hook(origin, hooker);
-    }
-
-    @Override
-    public <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Injector.PreInjector injector) {
+    public final <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Pre<?> injector) {
         return mBase.hook(origin, injector);
     }
 
     @Override
-    public <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Injector.PostInjector injector) {
+    public final <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Post<?> injector) {
         return mBase.hook(origin, injector);
     }
 
     @Override
-    public <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Injector.Hook injector) {
+    public final <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Hook<?,?> injector) {
         return mBase.hook(origin, injector);
     }
 
-    @NonNull
     @Override
-    public final <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Class<? extends Hooker> hooker) {
-        return mBase.hook(origin, priority, hooker);
-    }
-
-    @Override
-    public <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Injector.PreInjector injector) {
+    public final <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Pre<?> injector) {
         return mBase.hook(origin, priority, injector);
     }
 
     @Override
-    public <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Injector.PostInjector injector) {
+    public final <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Post<?> injector) {
         return mBase.hook(origin, priority, injector);
     }
 
     @Override
-    public <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Injector.Hook injector) {
+    public final <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Hook<?, ?> injector) {
         return mBase.hook(origin, priority, injector);
     }
 
@@ -162,7 +126,7 @@ public class XposedInterfaceWrapper implements XposedInterface {
     }
 
     @Override
-    public <T> void invokeOrigin(@NonNull Constructor<T> constructor, @NonNull T thisObject, Object... args) throws InvocationTargetException, IllegalArgumentException, IllegalAccessException {
+    public final <T> void invokeOrigin(@NonNull Constructor<T> constructor, @NonNull T thisObject, Object... args) throws InvocationTargetException, IllegalArgumentException, IllegalAccessException {
         mBase.invokeOrigin(constructor, thisObject, args);
     }
 
@@ -173,7 +137,7 @@ public class XposedInterfaceWrapper implements XposedInterface {
     }
 
     @Override
-    public <T> void invokeSpecial(@NonNull Constructor<T> constructor, @NonNull T thisObject, Object... args) throws InvocationTargetException, IllegalArgumentException, IllegalAccessException {
+    public final <T> void invokeSpecial(@NonNull Constructor<T> constructor, @NonNull T thisObject, Object... args) throws InvocationTargetException, IllegalArgumentException, IllegalAccessException {
         mBase.invokeSpecial(constructor, thisObject, args);
     }
 
@@ -207,25 +171,25 @@ public class XposedInterfaceWrapper implements XposedInterface {
 
     @NonNull
     @Override
-    public SharedPreferences getRemotePreferences(@NonNull String name) {
+    public final SharedPreferences getRemotePreferences(@NonNull String name) {
         return mBase.getRemotePreferences(name);
     }
 
     @NonNull
     @Override
-    public ApplicationInfo getApplicationInfo() {
+    public final ApplicationInfo getApplicationInfo() {
         return mBase.getApplicationInfo();
     }
 
     @NonNull
     @Override
-    public String[] listRemoteFiles() {
+    public final String[] listRemoteFiles() {
         return mBase.listRemoteFiles();
     }
 
     @NonNull
     @Override
-    public ParcelFileDescriptor openRemoteFile(@NonNull String name) throws FileNotFoundException {
+    public final ParcelFileDescriptor openRemoteFile(@NonNull String name) throws FileNotFoundException {
         return mBase.openRemoteFile(name);
     }
 }

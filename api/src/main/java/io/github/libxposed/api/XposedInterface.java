@@ -11,7 +11,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
@@ -46,187 +45,6 @@ public interface XposedInterface {
      */
     int FRAMEWORK_PRIVILEGE_EMBEDDED = 3;
 
-    /**
-     * The default hook priority.
-     */
-    int PRIORITY_DEFAULT = 50;
-    /**
-     * Execute the hook callback late.
-     */
-    int PRIORITY_LOWEST = -10000;
-    /**
-     * Execute the hook callback early.
-     */
-    int PRIORITY_HIGHEST = 10000;
-
-    /**
-     * Contextual interface for before invocation callbacks.
-     */
-    interface BeforeHookCallback {
-        /**
-         * Gets the method / constructor to be hooked.
-         */
-        @NonNull
-        Member getMember();
-
-        /**
-         * Gets the {@code this} object, or {@code null} if the method is static.
-         */
-        @Nullable
-        Object getThisObject();
-
-        /**
-         * Gets the arguments passed to the method / constructor. You can modify the arguments.
-         */
-        @NonNull
-        Object[] getArgs();
-
-        /**
-         * Sets the return value of the method and skip the invocation. If the procedure is a constructor,
-         * the {@code result} param will be ignored.
-         * Note that the after invocation callback will still be called.
-         *
-         * @param result The return value
-         */
-        void returnAndSkip(@Nullable Object result);
-
-        /**
-         * Throw an exception from the method / constructor and skip the invocation.
-         * Note that the after invocation callback will still be called.
-         *
-         * @param throwable The exception to be thrown
-         */
-        void throwAndSkip(@Nullable Throwable throwable);
-    }
-
-    /**
-     * Contextual interface for after invocation callbacks.
-     */
-    interface AfterHookCallback {
-        /**
-         * Gets the method / constructor to be hooked.
-         */
-        @NonNull
-        Member getMember();
-
-        /**
-         * Gets the {@code this} object, or {@code null} if the method is static.
-         */
-        @Nullable
-        Object getThisObject();
-
-        /**
-         * Gets all arguments passed to the method / constructor.
-         */
-        @NonNull
-        Object[] getArgs();
-
-        /**
-         * Gets the return value of the method or the before invocation callback. If the procedure is a
-         * constructor, a void method or an exception was thrown, the return value will be {@code null}.
-         */
-        @Nullable
-        Object getResult();
-
-        /**
-         * Gets the exception thrown by the method / constructor or the before invocation callback. If the
-         * procedure call was successful, the return value will be {@code null}.
-         */
-        @Nullable
-        Throwable getThrowable();
-
-        /**
-         * Gets whether the invocation was skipped by the before invocation callback.
-         */
-        boolean isSkipped();
-
-        /**
-         * Sets the return value of the method and skip the invocation. If the procedure is a constructor,
-         * the {@code result} param will be ignored.
-         *
-         * @param result The return value
-         */
-        void setResult(@Nullable Object result);
-
-        /**
-         * Sets the exception thrown by the method / constructor.
-         *
-         * @param throwable The exception to be thrown.
-         */
-        void setThrowable(@Nullable Throwable throwable);
-    }
-
-    /**
-     * Interface for method / constructor hooking. Xposed modules should define their own hooker class
-     * and implement this interface. Normally, a hooker class corresponds to a method / constructor, but
-     * there could also be a single hooker class for all of them. By this way you can implement an interface
-     * like the old API.
-     *
-     * <p>
-     * Classes implementing this interface should should provide two public static methods named
-     * before and after for before invocation and after invocation respectively.
-     * </p>
-     *
-     * <p>
-     * The before invocation method should have the following signature:<br/>
-     * Param {@code callback}: The {@link BeforeHookCallback} of the procedure call.<br/>
-     * Return value: If you want to save contextual information of one procedure call between the before
-     * and after callback, it could be a self-defined class, otherwise it should be {@code void}.
-     * </p>
-     *
-     * <p>
-     * The after invocation method should have the following signature:<br/>
-     * Param {@code callback}: The {@link AfterHookCallback} of the procedure call.<br/>
-     * Param {@code context} (optional): The contextual object returned by the before invocation.
-     * </p>
-     *
-     * <p>Example usage:</p>
-     *
-     * <pre>{@code
-     *   public class ExampleHooker implements Hooker {
-     *
-     *       public static void before(@NonNull BeforeHookCallback callback) {
-     *           // Pre-hooking logic goes here
-     *       }
-     *
-     *       public static void after(@NonNull AfterHookCallback callback) {
-     *           // Post-hooking logic goes here
-     *       }
-     *   }
-     *
-     *   public class ExampleHookerWithContext implements Hooker {
-     *
-     *       public static MyContext before(@NonNull BeforeHookCallback callback) {
-     *           // Pre-hooking logic goes here
-     *           return new MyContext();
-     *       }
-     *
-     *       public static void after(@NonNull AfterHookCallback callback, MyContext context) {
-     *           // Post-hooking logic goes here
-     *       }
-     *   }
-     * }</pre>
-     */
-    interface Hooker {
-    }
-
-    /**
-     * Interface for canceling a hook.
-     *
-     * @param <T> {@link Method} or {@link Constructor}
-     */
-    interface MethodUnhooker<T> {
-        /**
-         * Gets the method or constructor being hooked.
-         */
-        @NonNull
-        T getOrigin();
-
-        /**
-         * Cancels the hook. The behavior of calling this method multiple times is undefined.
-         */
-        void unhook();
-    }
 
     /**
      * Gets the Xposed framework name of current implementation.
@@ -258,104 +76,32 @@ public interface XposedInterface {
      */
     int getFrameworkPrivilege();
 
-    /**
-     * Hook a method with default priority.
-     *
-     * @param origin The method to be hooked
-     * @param hooker The hooker class
-     * @return Unhooker for canceling the hook
-     * @throws IllegalArgumentException if origin is abstract, framework internal or {@link Method#invoke},
-     *                                  or hooker is invalid
-     * @throws HookFailedError          if hook fails due to framework internal error
-     */
-    @NonNull
-    MethodUnhooker<Method> hook(@NonNull Method origin, @NonNull Class<? extends Hooker> hooker);
-    MethodUnhooker<Method> hook(@NonNull Method origin, @NonNull Injector.PreInjector injector);
-    MethodUnhooker<Method> hook(@NonNull Method origin, @NonNull Injector.PostInjector injector);
-    MethodUnhooker<Method> hook(@NonNull Method origin, @NonNull Injector.Hook injector);
+    Handler<Method> hook(@NonNull Method origin, @NonNull Pre<?> injector);
+    Handler<Method> hook(@NonNull Method origin, @NonNull Post<?> injector);
+    Handler<Method> hook(@NonNull Method origin, @NonNull Hook<?, ?> injector);
 
-    /**
-     * Hook the static initializer of a class with default priority.
-     * <p>
-     * Note: If the class is initialized, the hook will never be called.
-     * </p>
-     *
-     * @param origin The class to be hooked
-     * @param hooker The hooker class
-     * @return Unhooker for canceling the hook
-     * @throws IllegalArgumentException if class has no static initializer or hooker is invalid
-     * @throws HookFailedError          if hook fails due to framework internal error
-     */
-    @NonNull
-    <T> MethodUnhooker<Constructor<T>> hookClassInitializer(@NonNull Class<T> origin, @NonNull Class<? extends Hooker> hooker);
-
-    /**
-     * Hook the static initializer of a class with specified priority.
-     * <p>
-     * Note: If the class is initialized, the hook will never be called.
-     * </p>
-     *
-     * @param origin   The class to be hooked
-     * @param priority The hook priority
-     * @param hooker   The hooker class
-     * @return Unhooker for canceling the hook
-     * @throws IllegalArgumentException if class has no static initializer or hooker is invalid
-     * @throws HookFailedError          if hook fails due to framework internal error
-     */
-    @NonNull
-    <T> MethodUnhooker<Constructor<T>> hookClassInitializer(@NonNull Class<T> origin, int priority, @NonNull Class<? extends Hooker> hooker);
-
-    /**
-     * Hook a method with specified priority.
-     *
-     * @param origin   The method to be hooked
-     * @param priority The hook priority
-     * @param hooker   The hooker class
-     * @return Unhooker for canceling the hook
-     * @throws IllegalArgumentException if origin is abstract, framework internal or {@link Method#invoke},
-     *                                  or hooker is invalid
-     * @throws HookFailedError          if hook fails due to framework internal error
-     */
-    @NonNull
-    MethodUnhooker<Method> hook(@NonNull Method origin, int priority, @NonNull Class<? extends Hooker> hooker);
-    MethodUnhooker<Method> hook(@NonNull Method origin, int priority, @NonNull Injector.PreInjector injector);
-    MethodUnhooker<Method> hook(@NonNull Method origin, int priority, @NonNull Injector.PostInjector injector);
-    MethodUnhooker<Method> hook(@NonNull Method origin, int priority, @NonNull Injector.Hook injector);
+    Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Pre<?> injector);
+    Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Post<?> injector);
+    Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Hook<?, ?> injector);
 
     /**
      * Hook a constructor with default priority.
      *
      * @param <T>    The type of the constructor
      * @param origin The constructor to be hooked
-     * @param hooker The hooker class
-     * @return Unhooker for canceling the hook
+     * @param injector The injector
+     * @return Handler for canceling the hook
      * @throws IllegalArgumentException if origin is abstract, framework internal or {@link Method#invoke},
      *                                  or hooker is invalid
      * @throws HookFailedError          if hook fails due to framework internal error
      */
-    @NonNull
-    <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Class<? extends Hooker> hooker);
-    <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Injector.PreInjector injector);
-    <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Injector.PostInjector injector);
-    <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Injector.Hook injector);
+    <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Pre<?> injector);
+    <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Post<?> injector);
+    <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Hook<?, ?> injector);
 
-    /**
-     * Hook a constructor with specified priority.
-     *
-     * @param <T>      The type of the constructor
-     * @param origin   The constructor to be hooked
-     * @param priority The hook priority
-     * @param hooker   The hooker class
-     * @return Unhooker for canceling the hook
-     * @throws IllegalArgumentException if origin is abstract, framework internal or {@link Method#invoke},
-     *                                  or hooker is invalid
-     * @throws HookFailedError          if hook fails due to framework internal error
-     */
-    @NonNull
-    <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Class<? extends Hooker> hooker);
-    <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Injector.PreInjector injector);
-    <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Injector.PostInjector injector);
-    <T> MethodUnhooker<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Injector.Hook injector);
+    <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Pre<?> injector);
+    <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Post<?> injector);
+    <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Hook<?, ?> injector);
 
     /**
      * Deoptimizes a method in case hooked callee is not called because of inline.

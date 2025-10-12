@@ -3,25 +3,56 @@ package io.github.libxposed.api;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.lang.reflect.Executable;
+
 /**
- * Injector interface, cannot use this interface directly, use {@link PreInjector}, {@link PostInjector} or {@link Hook} instead.
+ * Injector interface, cannot use this interface directly, use {@link Pre}, {@link Post} or {@link Hook} instead.
  * @author KeepItLight
  */
 public interface Injector {
-    @FunctionalInterface
-    interface PreInjector extends Injector {
-        void inject(@NonNull XposedInterface.BeforeHookCallback callback, @NonNull Object[] args);
+
+    /**
+     * The default hook priority.
+     */
+    int PRIORITY_DEFAULT = 50;
+    /**
+     * Execute the hook callback late.
+     */
+    int PRIORITY_LOWEST = -10000;
+    /**
+     * Execute the hook callback early.
+     */
+    int PRIORITY_HIGHEST = 10000;
+
+    interface Lifecycle {
+        /**
+         * Called when the hook is ready.
+         */
+        void ready();
+        /**
+         * Called when the hook is pre-injected.
+         */
+        void enter();
+        /**
+         * Called when the hook is completed.
+         */
+        void done();
     }
-    @FunctionalInterface
-    interface PostInjector extends Injector {
-        void inject(@NonNull XposedInterface.AfterHookCallback callback, Object result, Throwable throwable);
-    }
-    interface Hook extends PreInjector, PostInjector {
-        @Override
-        default void inject(@NonNull XposedInterface.BeforeHookCallback callback, @NonNull Object[] args) {
-        }
-        @Override
-        default void inject(@NonNull XposedInterface.AfterHookCallback callback, Object result, Throwable throwable) {
-        }
+
+    /**
+     * Contextual interface for before invocation callbacks.
+     */
+    interface Context {
+        /**
+         * Gets the method / constructor to be hooked.
+         */
+        @NonNull
+        Executable getTarget();
+
+        /**
+         * Gets the {@code this} object, or {@code null} if the method is static.
+         */
+        @Nullable
+        Object getThisObject();
     }
 }
