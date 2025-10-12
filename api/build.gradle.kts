@@ -6,8 +6,8 @@ plugins {
 
 android {
     namespace = "io.github.libxposed.api"
-    compileSdk = 35
-    buildToolsVersion = "35.0.0"
+    compileSdk = 36
+    buildToolsVersion = "36.0.0"
 
     defaultConfig {
         minSdk = 24
@@ -15,13 +15,13 @@ android {
     }
 
     buildFeatures {
-        androidResources = false
+        android.androidResources.enable = false
         buildConfig = false
     }
 
     compileOptions {
-        targetCompatibility = JavaVersion.VERSION_1_8
-        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
     }
 
     publishing {
@@ -37,7 +37,7 @@ publishing {
         register<MavenPublication>("api") {
             artifactId = "api"
             group = "io.github.libxposed"
-            version = "100"
+            version = "200"
             pom {
                 name.set("api")
                 description.set("Modern Xposed API")
@@ -89,7 +89,6 @@ signing {
         sign(publishing.publications)
     }
 }
-
 
 dependencies {
     compileOnly(libs.annotation)
