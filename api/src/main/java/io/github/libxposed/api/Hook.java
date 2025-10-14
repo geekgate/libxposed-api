@@ -2,6 +2,7 @@ package io.github.libxposed.api;
 
 import androidx.annotation.NonNull;
 
+@SuppressWarnings("unused")
 public interface Hook<T extends Pre.Context, V extends Post.Context> extends Pre<T>, Post<V> {
 
     @Override
@@ -9,4 +10,7 @@ public interface Hook<T extends Pre.Context, V extends Post.Context> extends Pre
 
     @Override
     default void inject(@NonNull V ctx, Object result, Throwable throwable) {}
+
+    interface Default extends Hook<Pre.Context, Post.Context> {
+    }
 }

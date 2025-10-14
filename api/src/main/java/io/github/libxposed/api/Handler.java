@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
  *
  * @param <T> {@link Method} or {@link Constructor}
  */
+@SuppressWarnings("unused")
 public interface Handler<T> {
     /**
      * Gets the method or constructor being hooked.

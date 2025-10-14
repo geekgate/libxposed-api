@@ -76,13 +76,13 @@ public interface XposedInterface {
      */
     int getFrameworkPrivilege();
 
-    Handler<Method> hook(@NonNull Method origin, @NonNull Pre<?> injector);
-    Handler<Method> hook(@NonNull Method origin, @NonNull Post<?> injector);
-    Handler<Method> hook(@NonNull Method origin, @NonNull Hook<?, ?> injector);
+    <C extends Pre.Context> Handler<Method> hook(@NonNull Method origin, @NonNull Pre<C> injector);
+    <C extends Post.Context>Handler<Method> hook(@NonNull Method origin, @NonNull Post<C> injector);
+    <C extends Pre.Context, D extends Post.Context>Handler<Method> hook(@NonNull Method origin, @NonNull Hook<C, D> injector);
 
-    Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Pre<?> injector);
-    Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Post<?> injector);
-    Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Hook<?, ?> injector);
+    <C extends Pre.Context> Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Pre<C> injector);
+    <C extends Post.Context> Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Post<C> injector);
+    <C extends Pre.Context, D extends Post.Context> Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Hook<C, D> injector);
 
     /**
      * Hook a constructor with default priority.
@@ -95,13 +95,13 @@ public interface XposedInterface {
      *                                  or hooker is invalid
      * @throws HookFailedError          if hook fails due to framework internal error
      */
-    <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Pre<?> injector);
-    <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Post<?> injector);
-    <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Hook<?, ?> injector);
+    <T, C extends Pre.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Pre<C> injector);
+    <T, C extends Post.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Post<C> injector);
+    <T, C extends Pre.Context, D extends Post.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Hook<C, D> injector);
 
-    <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Pre<?> injector);
-    <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Post<?> injector);
-    <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Hook<?, ?> injector);
+    <T, C extends Pre.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Pre<C> injector);
+    <T, C extends Post.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Post<C> injector);
+    <T, C extends Pre.Context, D extends Post.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Hook<C, D> injector);
 
     /**
      * Deoptimizes a method in case hooked callee is not called because of inline.

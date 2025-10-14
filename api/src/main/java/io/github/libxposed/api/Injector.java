@@ -9,6 +9,7 @@ import java.lang.reflect.Executable;
  * Injector interface, cannot use this interface directly, use {@link Pre}, {@link Post} or {@link Hook} instead.
  * @author KeepItLight
  */
+@SuppressWarnings("unused")
 public interface Injector {
 
     /**

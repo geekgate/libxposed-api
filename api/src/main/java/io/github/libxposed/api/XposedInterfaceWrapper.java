@@ -19,6 +19,7 @@ import io.github.libxposed.api.utils.DexParser;
 /**
  * Wrap of {@link XposedInterface} used by the modules for the purpose of shielding framework implementation details.
  */
+@SuppressWarnings("unused")
 public class XposedInterfaceWrapper implements XposedInterface {
 
     private final XposedInterface mBase;
@@ -50,62 +51,62 @@ public class XposedInterfaceWrapper implements XposedInterface {
     }
 
     @Override
-    public final Handler<Method> hook(@NonNull Method origin, @NonNull Pre<?> injector) {
+    public final <C extends Pre.Context> Handler<Method> hook(@NonNull Method origin, @NonNull Pre<C> injector) {
         return mBase.hook(origin, injector);
     }
 
     @Override
-    public final Handler<Method> hook(@NonNull Method origin, @NonNull Post<?> injector) {
+    public final <C extends Post.Context> Handler<Method> hook(@NonNull Method origin, @NonNull Post<C> injector) {
         return mBase.hook(origin, injector);
     }
 
     @Override
-    public final Handler<Method> hook(@NonNull Method origin, @NonNull Hook<?,?> injector) {
+    public final <C extends Pre.Context, D extends Post.Context> Handler<Method> hook(@NonNull Method origin, @NonNull Hook<C, D> injector) {
         return mBase.hook(origin, injector);
     }
 
     @Override
-    public final Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Pre<?> injector) {
+    public final <C extends Pre.Context> Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Pre<C> injector) {
         return mBase.hook(origin, priority, injector);
     }
 
     @Override
-    public final Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Post<?> injector) {
+    public final <C extends Post.Context> Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Post<C> injector) {
         return mBase.hook(origin, priority, injector);
     }
 
     @Override
-    public final Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Hook<?,?> injector) {
+    public final <C extends Pre.Context, D extends Post.Context> Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Hook<C, D> injector) {
         return mBase.hook(origin, priority, injector);
     }
 
     @Override
-    public final <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Pre<?> injector) {
+    public final <T, C extends Pre.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Pre<C> injector) {
         return mBase.hook(origin, injector);
     }
 
     @Override
-    public final <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Post<?> injector) {
+    public final <T, C extends Post.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Post<C> injector) {
         return mBase.hook(origin, injector);
     }
 
     @Override
-    public final <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Hook<?,?> injector) {
+    public final <T, C extends Pre.Context, D extends Post.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Hook<C, D> injector) {
         return mBase.hook(origin, injector);
     }
 
     @Override
-    public final <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Pre<?> injector) {
+    public final <T, C extends Pre.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Pre<C> injector) {
         return mBase.hook(origin, priority, injector);
     }
 
     @Override
-    public final <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Post<?> injector) {
+    public final <T, C extends Post.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Post<C> injector) {
         return mBase.hook(origin, priority, injector);
     }
 
     @Override
-    public final <T> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Hook<?, ?> injector) {
+    public final <T, C extends Pre.Context, D extends Post.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Hook<C, D> injector) {
         return mBase.hook(origin, priority, injector);
     }
 

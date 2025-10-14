@@ -8,7 +8,7 @@ import java.lang.reflect.Executable;
 /**
  * Post-injector runs after the original method / constructor is invoked.
  */
-@FunctionalInterface
+@FunctionalInterface @SuppressWarnings("unused")
 public interface Post<T extends Post.Context> extends Injector {
 
     /**
@@ -104,5 +104,8 @@ public interface Post<T extends Post.Context> extends Injector {
         public Object getThisObject() {
             return src.getThisObject();
         }
+    }
+
+    interface Default extends Post<Post.Context> {
     }
 }

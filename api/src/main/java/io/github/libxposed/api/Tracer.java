@@ -7,7 +7,8 @@ import androidx.annotation.NonNull;
 /**
  * Tracer-injector
  */
-public class Tracer implements Post<Tracer.MyContext> {
+@SuppressWarnings("unused")
+public class Tracer implements Post.Default {
     private final String tag;
     private final String entry;
 
@@ -24,14 +25,8 @@ public class Tracer implements Post<Tracer.MyContext> {
         this.entry = entry;
     }
 
-    abstract public static class MyContext implements Context {
-        public MyContext(Object target) {
-
-        }
-    }
-
     @Override
-    public void inject(@NonNull MyContext context, Object result, Throwable throwable) {
+    public void inject(@NonNull Context context, Object result, Throwable throwable) {
         var entry = this.entry;
         if (entry == null || entry.isEmpty()) {
             entry = context.getTarget().toString();

@@ -8,7 +8,7 @@ import java.lang.reflect.Executable;
 /**
  * Pre-injector runs before the original method / constructor is invoked.
  */
-@FunctionalInterface
+@FunctionalInterface @SuppressWarnings("unused")
 public interface Pre<T extends Pre.Context> extends Injector {
 
     /**
@@ -78,5 +78,8 @@ public interface Pre<T extends Pre.Context> extends Injector {
         public Object getThisObject() {
             return src.getThisObject();
         }
+    }
+
+    interface Default extends Pre<Context> {
     }
 }
