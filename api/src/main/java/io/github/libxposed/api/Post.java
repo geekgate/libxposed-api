@@ -9,17 +9,7 @@ import java.lang.reflect.Executable;
  * Post-injector runs after the original method / constructor is invoked.
  */
 @FunctionalInterface @SuppressWarnings("unused")
-public interface Post<T extends Post.Context> extends Injector {
-
-    /**
-     * Wraps the original context.
-     *
-     * @param src The original context
-     * @return The wrapped context
-     */
-    default T wrap(Context src) {
-        return null;
-    }
+public interface Post extends Injector {
 
     /**
      * Callbacks after the original method / constructor is invoked.
@@ -30,7 +20,7 @@ public interface Post<T extends Post.Context> extends Injector {
      * @param throwable The exception thrown by the method / constructor or the before invocation callback. If the
      *                  procedure call was successful, the return value will be {@code null}.
      */
-    void inject(@NonNull T ctx, Object result, Throwable throwable);
+    void inject(@NonNull Context ctx, Object result, Throwable throwable);
 
     /**
      * Contextual interface for after invocation callbacks.
@@ -64,11 +54,11 @@ public interface Post<T extends Post.Context> extends Injector {
         void setThrowable(@Nullable Throwable throwable);
     }
 
-    abstract class ContextBase implements Context {
+    class ContextWrapper implements Context {
 
         private final Context src;
 
-        public ContextBase(Context src) {
+        public ContextWrapper(Context src) {
             this.src = src;
         }
 
@@ -104,8 +94,10 @@ public interface Post<T extends Post.Context> extends Injector {
         public Object getThisObject() {
             return src.getThisObject();
         }
-    }
 
-    interface Default extends Post<Post.Context> {
+        @Nullable @Override
+        public Object getThat() {
+            return src.getThisObject();
+        }
     }
 }

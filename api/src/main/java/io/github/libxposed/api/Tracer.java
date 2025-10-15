@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
  * Tracer-injector
  */
 @SuppressWarnings("unused")
-public class Tracer implements Post.Default {
+public class Tracer implements Post {
     private final String tag;
     private final String entry;
 

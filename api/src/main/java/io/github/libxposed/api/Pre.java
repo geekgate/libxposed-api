@@ -9,17 +9,7 @@ import java.lang.reflect.Executable;
  * Pre-injector runs before the original method / constructor is invoked.
  */
 @FunctionalInterface @SuppressWarnings("unused")
-public interface Pre<T extends Pre.Context> extends Injector {
-
-    /**
-     * Wraps the original context.
-     *
-     * @param src The original context
-     * @return The wrapped context
-     */
-    default T wrap(Context src) {
-        return null;
-    }
+public interface Pre extends Injector {
 
     /**
      * Callbacks before the original method / constructor is invoked.
@@ -27,7 +17,7 @@ public interface Pre<T extends Pre.Context> extends Injector {
      * @param ctx The context
      * @param args The arguments passed to the method / constructor
      */
-    void inject(@NonNull T ctx, @NonNull Object[] args);
+    void inject(@NonNull Context ctx, @NonNull Object[] args);
 
     /**
      * Contextual interface for before invocation callbacks.
@@ -51,11 +41,11 @@ public interface Pre<T extends Pre.Context> extends Injector {
         void throwAndSkip(@Nullable Throwable throwable);
     }
 
-    abstract class ContextBase implements Context {
+    class ContextWrapper implements Context {
 
         private final Context src;
 
-        public ContextBase(Context src) {
+        public ContextWrapper(Context src) {
             this.src = src;
         }
 
@@ -78,8 +68,11 @@ public interface Pre<T extends Pre.Context> extends Injector {
         public Object getThisObject() {
             return src.getThisObject();
         }
+
+        @Nullable @Override
+        public Object getThat() {
+            return src.getThisObject();
+        }
     }
 
-    interface Default extends Pre<Context> {
-    }
 }

@@ -1,26 +1,14 @@
 package io.github.libxposed.api;
 
 
-import androidx.annotation.NonNull;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-
 /**
- * Interface for canceling a hook.
- *
- * @param <T> {@link Method} or {@link Constructor}
+ * Interface for canceling a set of hooks. When it is applied to a specific individual hook,
+ * use {@link Injector.Handler} instead.
  */
 @SuppressWarnings("unused")
-public interface Handler<T> {
+public interface Handler extends Stateful {
     /**
-     * Gets the method or constructor being hooked.
-     */
-    @NonNull
-    T getOrigin();
-
-    /**
-     * Cancels the hook. The behavior of calling this method multiple times is undefined.
+     * Cancels the hook.
      */
     void cancel();
 }

@@ -10,11 +10,13 @@ import androidx.annotation.Nullable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
 import io.github.libxposed.api.errors.HookFailedError;
+import io.github.libxposed.api.Injector.Handler;
 import io.github.libxposed.api.utils.DexParser;
 
 /**
@@ -76,13 +78,37 @@ public interface XposedInterface {
      */
     int getFrameworkPrivilege();
 
-    <C extends Pre.Context> Handler<Method> hook(@NonNull Method origin, @NonNull Pre<C> injector);
-    <C extends Post.Context>Handler<Method> hook(@NonNull Method origin, @NonNull Post<C> injector);
-    <C extends Pre.Context, D extends Post.Context>Handler<Method> hook(@NonNull Method origin, @NonNull Hook<C, D> injector);
+    default Handler<?> hook(@NonNull Executable origin, @NonNull Pre injector) throws IllegalArgumentException {
+        if (origin instanceof Method) {
+            return hookMethod((Method) origin, injector);
+        } else if (origin instanceof Constructor) {
+            return hookConstructor((Constructor<?>) origin, injector);
+        } else {
+            throw new IllegalArgumentException("Unsupported origin type: " + origin.getClass().getName());
+        }
+    }
+    default Handler<?> hook(@NonNull Executable origin, @NonNull Post injector) throws IllegalArgumentException {
+        if (origin instanceof Method) {
+            return hookMethod((Method) origin, injector);
+        } else if (origin instanceof Constructor) {
+            return hookConstructor((Constructor<?>) origin, injector);
+        } else {
+            throw new IllegalArgumentException("Unsupported origin type: " + origin.getClass().getName());
+        }
+    }
+    default Handler<?> hook(@NonNull Executable origin, @NonNull Hook injector) throws IllegalArgumentException {
+        if (origin instanceof Method) {
+            return hookMethod((Method) origin, injector);
+        } else if (origin instanceof Constructor) {
+            return hookConstructor((Constructor<?>) origin, injector);
+        } else {
+            throw new IllegalArgumentException("Unsupported origin type: " + origin.getClass().getName());
+        }
+    }
 
-    <C extends Pre.Context> Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Pre<C> injector);
-    <C extends Post.Context> Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Post<C> injector);
-    <C extends Pre.Context, D extends Post.Context> Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Hook<C, D> injector);
+    Handler<Method> hookMethod(@NonNull Method origin, @NonNull Pre injector);
+    Handler<Method> hookMethod(@NonNull Method origin, @NonNull Post injector);
+    Handler<Method> hookMethod(@NonNull Method origin, @NonNull Hook injector);
 
     /**
      * Hook a constructor with default priority.
@@ -95,13 +121,9 @@ public interface XposedInterface {
      *                                  or hooker is invalid
      * @throws HookFailedError          if hook fails due to framework internal error
      */
-    <T, C extends Pre.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Pre<C> injector);
-    <T, C extends Post.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Post<C> injector);
-    <T, C extends Pre.Context, D extends Post.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Hook<C, D> injector);
-
-    <T, C extends Pre.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Pre<C> injector);
-    <T, C extends Post.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Post<C> injector);
-    <T, C extends Pre.Context, D extends Post.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Hook<C, D> injector);
+    <T> Handler<Constructor<T>> hookConstructor(@NonNull Constructor<T> origin, @NonNull Pre injector);
+    <T> Handler<Constructor<T>> hookConstructor(@NonNull Constructor<T> origin, @NonNull Post injector);
+    <T> Handler<Constructor<T>> hookConstructor(@NonNull Constructor<T> origin, @NonNull Hook injector);
 
     /**
      * Deoptimizes a method in case hooked callee is not called because of inline.
@@ -280,4 +302,150 @@ public interface XposedInterface {
      */
     @NonNull
     ParcelFileDescriptor openRemoteFile(@NonNull String name) throws FileNotFoundException;
+
+
+    /**
+     * Wrap of {@link XposedInterface} used by the modules for the purpose of shielding framework implementation details.
+     */
+    @SuppressWarnings("unused")
+    class Wrapper implements XposedInterface {
+
+        private final XposedInterface mBase;
+
+        Wrapper(@NonNull XposedInterface base) {
+            mBase = base;
+        }
+
+        @NonNull
+        @Override
+        public final String getFrameworkName() {
+            return mBase.getFrameworkName();
+        }
+
+        @NonNull
+        @Override
+        public final String getFrameworkVersion() {
+            return mBase.getFrameworkVersion();
+        }
+
+        @Override
+        public final long getFrameworkVersionCode() {
+            return mBase.getFrameworkVersionCode();
+        }
+
+        @Override
+        public final int getFrameworkPrivilege() {
+            return mBase.getFrameworkPrivilege();
+        }
+
+        @Override
+        public final Handler<Method> hookMethod(@NonNull Method origin, @NonNull Pre injector) {
+            return mBase.hookMethod(origin, injector);
+        }
+        @Override
+        public final Handler<Method> hookMethod(@NonNull Method origin, @NonNull Post injector) {
+            return mBase.hookMethod(origin, injector);
+        }
+        @Override
+        public final Handler<Method> hookMethod(@NonNull Method origin, @NonNull Hook injector) {
+            return mBase.hookMethod(origin, injector);
+        }
+
+        @Override
+        public final <T> Handler<Constructor<T>> hookConstructor(@NonNull Constructor<T> origin, @NonNull Pre injector) {
+            return mBase.hookConstructor(origin, injector);
+        }
+        @Override
+        public final <T> Handler<Constructor<T>> hookConstructor(@NonNull Constructor<T> origin, @NonNull Post injector) {
+            return mBase.hookConstructor(origin, injector);
+        }
+        @Override
+        public final <T> Handler<Constructor<T>> hookConstructor(@NonNull Constructor<T> origin, @NonNull Hook injector) {
+            return mBase.hookConstructor(origin, injector);
+        }
+
+        @Override
+        public final boolean deoptimize(@NonNull Method method) {
+            return mBase.deoptimize(method);
+        }
+
+        @Override
+        public final <T> boolean deoptimize(@NonNull Constructor<T> constructor) {
+            return mBase.deoptimize(constructor);
+        }
+
+        @Nullable
+        @Override
+        public final Object invokeOrigin(@NonNull Method method, @Nullable Object thisObject, Object... args) throws InvocationTargetException, IllegalArgumentException, IllegalAccessException {
+            return mBase.invokeOrigin(method, thisObject, args);
+        }
+
+        @Override
+        public final <T> void invokeOrigin(@NonNull Constructor<T> constructor, @NonNull T thisObject, Object... args) throws InvocationTargetException, IllegalArgumentException, IllegalAccessException {
+            mBase.invokeOrigin(constructor, thisObject, args);
+        }
+
+        @Nullable
+        @Override
+        public final Object invokeSpecial(@NonNull Method method, @NonNull Object thisObject, Object... args) throws InvocationTargetException, IllegalArgumentException, IllegalAccessException {
+            return mBase.invokeSpecial(method, thisObject, args);
+        }
+
+        @Override
+        public final <T> void invokeSpecial(@NonNull Constructor<T> constructor, @NonNull T thisObject, Object... args) throws InvocationTargetException, IllegalArgumentException, IllegalAccessException {
+            mBase.invokeSpecial(constructor, thisObject, args);
+        }
+
+        @NonNull
+        @Override
+        public final <T> T newInstanceOrigin(@NonNull Constructor<T> constructor, Object... args) throws InvocationTargetException, IllegalArgumentException, IllegalAccessException, InstantiationException {
+            return mBase.newInstanceOrigin(constructor, args);
+        }
+
+        @NonNull
+        @Override
+        public final <T, U> U newInstanceSpecial(@NonNull Constructor<T> constructor, @NonNull Class<U> subClass, Object... args) throws InvocationTargetException, IllegalArgumentException, IllegalAccessException, InstantiationException {
+            return mBase.newInstanceSpecial(constructor, subClass, args);
+        }
+
+        @Override
+        public final void log(@NonNull String message) {
+            mBase.log(message);
+        }
+
+        @Override
+        public final void log(@NonNull String message, @NonNull Throwable throwable) {
+            mBase.log(message, throwable);
+        }
+
+        @Nullable
+        @Override
+        public final DexParser parseDex(@NonNull ByteBuffer dexData, boolean includeAnnotations) throws IOException {
+            return mBase.parseDex(dexData, includeAnnotations);
+        }
+
+        @NonNull
+        @Override
+        public final SharedPreferences getRemotePreferences(@NonNull String name) {
+            return mBase.getRemotePreferences(name);
+        }
+
+        @NonNull
+        @Override
+        public final ApplicationInfo getApplicationInfo() {
+            return mBase.getApplicationInfo();
+        }
+
+        @NonNull
+        @Override
+        public final String[] listRemoteFiles() {
+            return mBase.listRemoteFiles();
+        }
+
+        @NonNull
+        @Override
+        public final ParcelFileDescriptor openRemoteFile(@NonNull String name) throws FileNotFoundException {
+            return mBase.openRemoteFile(name);
+        }
+    }
 }
