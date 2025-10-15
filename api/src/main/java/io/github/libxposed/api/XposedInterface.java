@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
@@ -76,13 +77,75 @@ public interface XposedInterface {
      */
     int getFrameworkPrivilege();
 
-    <C extends Pre.Context> Handler<Method> hook(@NonNull Method origin, @NonNull Pre<C> injector);
-    <C extends Post.Context>Handler<Method> hook(@NonNull Method origin, @NonNull Post<C> injector);
-    <C extends Pre.Context, D extends Post.Context>Handler<Method> hook(@NonNull Method origin, @NonNull Hook<C, D> injector);
+    default <C extends Pre.Context> Handler<?> hook(@NonNull Executable origin, @NonNull Pre<C> injector) throws IllegalArgumentException {
+        if (origin instanceof Method) {
+            return hookMethod((Method) origin, injector);
+        } else if (origin instanceof Constructor) {
+            return hookConstructor((Constructor<?>) origin, injector);
+        } else {
+            throw new IllegalArgumentException("Unsupported origin type: " + origin.getClass().getName());
+        }
+    }
+    default <C extends Post.Context> Handler<?> hook(@NonNull Executable origin, @NonNull Post<C> injector) {
+        if (origin instanceof Method) {
+            return hookMethod((Method) origin, injector);
+        } else if (origin instanceof Constructor) {
+            return hookConstructor((Constructor<?>) origin, injector);
+        } else {
+            throw new IllegalArgumentException("Unsupported origin type: " + origin.getClass().getName());
+        }
+    }
+    default <C extends Pre.Context, D extends Post.Context> Handler<?> hook(@NonNull Executable origin, @NonNull Hook<C, D> injector) throws IllegalArgumentException {
+        if (origin instanceof Method) {
+            return hookMethod((Method) origin, injector);
+        } else if (origin instanceof Constructor) {
+            return hookConstructor((Constructor<?>) origin, injector);
+        } else {
+            throw new IllegalArgumentException("Unsupported origin type: " + origin.getClass().getName());
+        }
+    }
 
-    <C extends Pre.Context> Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Pre<C> injector);
-    <C extends Post.Context> Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Post<C> injector);
-    <C extends Pre.Context, D extends Post.Context> Handler<Method> hook(@NonNull Method origin, int priority, @NonNull Hook<C, D> injector);
+    default <C extends Pre.Context> Handler<?> hook(@NonNull Executable origin, int priority, @NonNull Pre<C> injector) throws IllegalArgumentException {
+        if (origin instanceof Method) {
+            return hookMethod((Method) origin, injector);
+        } else if (origin instanceof Constructor) {
+            return hookConstructor((Constructor<?>) origin, injector);
+        } else {
+            throw new IllegalArgumentException("Unsupported origin type: " + origin.getClass().getName());
+        }
+    }
+    default <C extends Post.Context> Handler<?> hook(@NonNull Executable origin, int priority, @NonNull Post<C> injector) throws IllegalArgumentException {
+        if (origin instanceof Method) {
+            return hookMethod((Method) origin, injector);
+        } else if (origin instanceof Constructor) {
+            return hookConstructor((Constructor<?>) origin, injector);
+        } else {
+            throw new IllegalArgumentException("Unsupported origin type: " + origin.getClass().getName());
+        }
+    }
+    default <C extends Pre.Context, D extends Post.Context> Handler<?> hook(@NonNull Executable origin, int priority, @NonNull Hook<C, D> injector) throws IllegalArgumentException {
+        if (origin instanceof Method) {
+            return hookMethod((Method) origin, injector);
+        } else if (origin instanceof Constructor) {
+            return hookConstructor((Constructor<?>) origin, injector);
+        } else {
+            throw new IllegalArgumentException("Unsupported origin type: " + origin.getClass().getName());
+        }
+    }
+
+    default <C extends Pre.Context> Handler<Method> hookMethod(@NonNull Method origin, @NonNull Pre<C> injector) {
+        return hookMethod(origin, Injector.PRIORITY_DEFAULT, injector);
+    }
+    default <C extends Post.Context>Handler<Method> hookMethod(@NonNull Method origin, @NonNull Post<C> injector) {
+        return hookMethod(origin, Injector.PRIORITY_DEFAULT, injector);
+    }
+    default <C extends Pre.Context, D extends Post.Context>Handler<Method> hookMethod(@NonNull Method origin, @NonNull Hook<C, D> injector) {
+        return hookMethod(origin, Injector.PRIORITY_DEFAULT, injector);
+    }
+
+    <C extends Pre.Context> Handler<Method> hookMethod(@NonNull Method origin, int priority, @NonNull Pre<C> injector);
+    <C extends Post.Context> Handler<Method> hookMethod(@NonNull Method origin, int priority, @NonNull Post<C> injector);
+    <C extends Pre.Context, D extends Post.Context> Handler<Method> hookMethod(@NonNull Method origin, int priority, @NonNull Hook<C, D> injector);
 
     /**
      * Hook a constructor with default priority.
@@ -95,13 +158,19 @@ public interface XposedInterface {
      *                                  or hooker is invalid
      * @throws HookFailedError          if hook fails due to framework internal error
      */
-    <T, C extends Pre.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Pre<C> injector);
-    <T, C extends Post.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Post<C> injector);
-    <T, C extends Pre.Context, D extends Post.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, @NonNull Hook<C, D> injector);
+    default <T, C extends Pre.Context> Handler<Constructor<T>> hookConstructor(@NonNull Constructor<T> origin, @NonNull Pre<C> injector) {
+        return hookConstructor(origin, Injector.PRIORITY_DEFAULT, injector);
+    }
+    default <T, C extends Post.Context> Handler<Constructor<T>> hookConstructor(@NonNull Constructor<T> origin, @NonNull Post<C> injector) {
+        return hookConstructor(origin, Injector.PRIORITY_DEFAULT, injector);
+    }
+    default <T, C extends Pre.Context, D extends Post.Context> Handler<Constructor<T>> hookConstructor(@NonNull Constructor<T> origin, @NonNull Hook<C, D> injector) {
+        return hookConstructor(origin, Injector.PRIORITY_DEFAULT, injector);
+    }
 
-    <T, C extends Pre.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Pre<C> injector);
-    <T, C extends Post.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Post<C> injector);
-    <T, C extends Pre.Context, D extends Post.Context> Handler<Constructor<T>> hook(@NonNull Constructor<T> origin, int priority, @NonNull Hook<C, D> injector);
+    <T, C extends Pre.Context> Handler<Constructor<T>> hookConstructor(@NonNull Constructor<T> origin, int priority, @NonNull Pre<C> injector);
+    <T, C extends Post.Context> Handler<Constructor<T>> hookConstructor(@NonNull Constructor<T> origin, int priority, @NonNull Post<C> injector);
+    <T, C extends Pre.Context, D extends Post.Context> Handler<Constructor<T>> hookConstructor(@NonNull Constructor<T> origin, int priority, @NonNull Hook<C, D> injector);
 
     /**
      * Deoptimizes a method in case hooked callee is not called because of inline.

@@ -17,8 +17,9 @@ public interface Pre<T extends Pre.Context> extends Injector {
      * @param src The original context
      * @return The wrapped context
      */
-    default T wrap(Context src) {
-        return null;
+    @NonNull @SuppressWarnings("unchecked")
+    default T wrap(@NonNull Context src) throws ClassCastException {
+        return (T) src;
     }
 
     /**
@@ -51,11 +52,11 @@ public interface Pre<T extends Pre.Context> extends Injector {
         void throwAndSkip(@Nullable Throwable throwable);
     }
 
-    abstract class ContextBase implements Context {
+    class ContextWrapper implements Context {
 
         private final Context src;
 
-        public ContextBase(Context src) {
+        public ContextWrapper(Context src) {
             this.src = src;
         }
 
@@ -80,6 +81,11 @@ public interface Pre<T extends Pre.Context> extends Injector {
         }
     }
 
+    @FunctionalInterface
     interface Default extends Pre<Context> {
+        @NonNull
+        default Pre.Context wrap(@NonNull Pre.Context src) {
+            return src;
+        }
     }
 }
