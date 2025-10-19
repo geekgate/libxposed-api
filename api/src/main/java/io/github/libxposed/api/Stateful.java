@@ -4,9 +4,9 @@ package io.github.libxposed.api;
 public interface Stateful {
 
     /**
-     * Gets the state of the hook.
+     * Indicate whether the injector is ready.
      *
-     * @return The state of the hook
+     * @return true if the injector is ready, false otherwise.
      */
     boolean isReady();
     /**
