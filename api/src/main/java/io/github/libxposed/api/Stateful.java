@@ -19,7 +19,7 @@ public interface Stateful {
     void disable();
 
     enum State {
-        Undefined, Ready, Done,
+        Undefined, Ready,
     }
 
     interface Default extends Stateful {
